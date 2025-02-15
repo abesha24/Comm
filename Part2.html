@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Feedback</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .rating {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .star {
+            font-size: 24px;
+            cursor: pointer;
+            color: #bdc3c7;
+            transition: color 0.2s;
+        }
+
+        .star.active {
+            color: #f1c40f;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .comments {
+            margin-top: 40px;
+        }
+
+        .comment {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+
+        .comment-rating {
+            color: #f1c40f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Delivery Feedback</h1>
+        
+        <form id="commentForm">
+            <div class="form-group">
+                <label for="name">Your Name:</label>
+                <input type="text" id="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="orderId">Order ID:</label>
+                <input type="text" id="orderId" required>
+            </div>
+
+            <div class="form-group">
+                <label>Rating:</label>
+                <div class="rating" id="rating">
+                    <div class="star" data-value="1">★</div>
+                    <div class="star" data-value="2">★</div>
+                    <div class="star" data-value="3">★</div>
+                    <div class="star" data-value="4">★</div>
+                    <div class="star" data-value="5">★</div>
+                </div>
+                <input type="hidden" id="selectedRating" required>
+            </div>
+
+            <div class="form-group">
+                <label for="comment">Your Comment:</label>
+                <textarea id="comment" rows="4" required></textarea>
+            </div>
+
+            <button type="submit">Submit Feedback</button>
+        </form>
+
+        <div class="comments" id="comments">
+            <!-- Comments will be added here -->
+        </div>
+    </div>
+
+    <script>
+        const ratingStars = [...document.querySelectorAll('.star')];
+        let selectedRating = 0;
+
+        // Star rating functionality
+        ratingStars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = parseInt(star.dataset.value);
+                selectedRating = value;
+                document.getElementById('selectedRating').value = value;
+                
+                ratingStars.forEach(s => {
+                    s.classList.toggle('active', parseInt(s.dataset.value) <= value);
+                });
+            });
+        });
+
+        // Form submission
+        document.getElementById('commentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const comment = {
+                name: document.getElementById('name').value,
+                orderId: document.getElementById('orderId').value,
+                rating: selectedRating,
+                text: document.getElementById('comment').value,
+                date: new Date().toLocaleString()
+            };
+
+            addComment(comment);
+            document.getElementById('commentForm').reset();
+            selectedRating = 0;
+            ratingStars.forEach(star => star.classList.remove('active'));
+        });
+
+        function addComment(comment) {
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'comment';
+            commentDiv.innerHTML = `
+                <div class="comment-header">
+                    <span>${comment.name}</span>
+                    <span>${comment.date}</span>
+                </div>
+                <div class="comment-header">
+                    <span>Order ID: ${comment.orderId}</span>
+                    <span class="comment-rating">${'★'.repeat(comment.rating)}${'☆'.repeat(5 - comment.rating)}</span>
+                </div>
+                <p>${comment.text}</p>
+            `;
+
+            document.getElementById('comments').prepend(commentDiv);
+        }
+    </script>
+</body>
+</html>
